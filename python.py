@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import RandomizedSearchCV
 from sklearn.model_selection import cross_val_score
 from datetime import datetime
 
@@ -108,12 +109,19 @@ mapped = encode(df, features_to_map, [mapper[x] for x in features_to_map])
 train_X = df.drop('Survived', axis=1)
 train_y = df['Survived']
 
-tree = RandomForestClassifier(150)
-scores = cross_val_score(tree, train_X, train_y, cv=10)
-print(scores)
-print("mean:", np.mean(scores))
+params = {"n_estimators": [70, 80, 90, 100, 110, 120, 130, 140, 150], "criterion": ["gini", "entropy"], 
+          "min_samples_split": [0.1, 0.2, 0.3, 0.4, 0.5], 
+          "min_samples_leaf": [0.1, 0.2, 0.3, 0.4, 0.5]}
 
-exit(0)
+tree = RandomForestClassifier(150, min_samples_split=0.2, min_samples_leaf=0.2, criterion="entropy")
+#gscv = RandomizedSearchCV(tree, params, n_iter = 100, cv = 3)
+#gscv.fit(train_X, train_y)
+#print(gscv.best_params_)
+#scores = cross_val_score(tree, train_X, train_y, cv=10)
+#print(scores)
+#print("mean:", np.mean(scores))
+
+#exit(0)
 tree.fit(train_X, train_y)
 
 #print(tree.score(train_X, train_y))
