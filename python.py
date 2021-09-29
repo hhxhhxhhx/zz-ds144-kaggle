@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import RandomizedSearchCV
+from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import cross_val_score
 from datetime import datetime
 
@@ -109,19 +110,39 @@ mapped = encode(df, features_to_map, [mapper[x] for x in features_to_map])
 train_X = df.drop('Survived', axis=1)
 train_y = df['Survived']
 
-params = {"n_estimators": [70, 80, 90, 100, 110, 120, 130, 140, 150], "criterion": ["gini", "entropy"], 
+params = {"n_estimators": [120, 130, 140, 150, 160, 170, 180, 190], "criterion": ["gini", "entropy"], 
           "min_samples_split": [0.1, 0.2, 0.3, 0.4, 0.5], 
           "min_samples_leaf": [0.1, 0.2, 0.3, 0.4, 0.5]}
 
-tree = RandomForestClassifier(150, min_samples_split=0.2, min_samples_leaf=0.2, criterion="entropy")
-#gscv = RandomizedSearchCV(tree, params, n_iter = 100, cv = 3)
-#gscv.fit(train_X, train_y)
-#print(gscv.best_params_)
-#scores = cross_val_score(tree, train_X, train_y, cv=10)
-#print(scores)
-#print("mean:", np.mean(scores))
+tree = RandomForestClassifier(140, min_samples_split=0.2, min_samples_leaf=0.2, criterion="entropy")
 
-#exit(0)
+def print_scores(cv=10):
+    scores = cross_val_score(tree, train_X, train_y, cv=cv)
+    print(scores)
+    print("Mean:", np.mean(scores))
+    exit(0)
+
+def do_random_search_cv(parameters, n_iter=200, cv=5):
+    dat = RandomizedSearchCV(tree, parameters, n_iter=n_iter, cv=cv)
+    dat.fit(train_X, train_y)
+    print("Best parameters:", dat.best_params_)
+    exit(0)
+
+def do_grid_search_cv(parameters, cv=5):
+    dat = GridSearchCV(tree, parameters, cv=cv)
+    dat.fit(train_X, train_y)
+    print("Best parameters:", dat.best_params_)
+    exit(0)
+
+
+# print_scores() # uncomment this line to print cross validation scores
+
+# do_random_search_cv(params) # uncomment this line to print best hyperparameters using RandomSearchCV
+
+# do_grid_search_cv(params) # uncomment this line to print best hyperparameters using GridSearchCV
+
+# otherwise, fit this and output the predictions into a "generated_submissions/" directory
+
 tree.fit(train_X, train_y)
 
 #print(tree.score(train_X, train_y))
