@@ -1,4 +1,6 @@
 generated_submissions/
+classifier_settings/
+temp.py
 test.csv
 train.csv
 gender_submission.csv
